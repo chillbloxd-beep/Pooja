@@ -1,0 +1,9 @@
+{
+  "name": "ultimate-search-operator-builder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Single-file static Google search operator builder for Cloudflare Pages.",
+  "scripts": {
+    "build": "mkdir -p dist && cp index.html dist/index.html"
+  }
+}
