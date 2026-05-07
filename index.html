@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultimate Search Operator Builder</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: rgba(19, 25, 39, 0.9);
+      --panel-2: rgba(25, 33, 51, 0.82);
+      --text: #edf4ff;
+      --muted: #94a3b8;
+      --border: rgba(148, 163, 184, 0.18);
+      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --blue: #38bdf8;
+      --purple: #a78bfa;
+      --green: #34d399;
+      --orange: #fb923c;
+      --pink: #f472b6;
+      --red: #fb7185;
+      --yellow: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.23), transparent 34rem),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.23), transparent 34rem),
+        linear-gradient(135deg, #070a11 0%, #101525 50%, #090d17 100%);
+    }
+
+    .app {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 38px 0 48px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .intro {
+      padding: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -120px auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.16);
+      filter: blur(12px);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 5vw, 4.4rem);
+      line-height: 0.95;
+      letter-spacing: -0.07em;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      max-width: 700px;
+    }
+
+    .quick-help {
+      padding: 24px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .quick-help h2,
+    .section h2 {
+      margin: 0;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      color: #c7d2fe;
+    }
+
+    .tip {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .builder {
+      padding: 24px;
+      margin-bottom: 22px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #dbeafe;
+      font-weight: 700;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr minmax(200px, 0.35fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      color: var(--text);
+      background: #0d1321;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 18px;
+      padding: 15px 16px;
+      font: inherit;
+      outline: none;
+      transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(56, 189, 248, 0.85);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.13);
+      background: #0b1220;
+    }
+
+    textarea {
+      min-height: 108px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .preview-row {
+      display: grid;
+      gap: 10px;
+    }
+
+    .preview-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .preview {
+      min-height: 86px;
+      padding: 16px;
+      border-radius: 20px;
+      background: #050814;
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      color: #bae6fd;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 34px;
+      margin: 16px 0 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      padding: 7px 11px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: #e0f2fe;
+      font-size: 0.82rem;
+    }
+
+    .sections {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .section {
+      padding: 20px;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .pill {
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+      user-select: none;
+    }
+
+    .pill:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .pill.active {
+      color: #06111f;
+      font-weight: 800;
+      box-shadow: 0 10px 28px rgba(56, 189, 248, 0.18);
+    }
+
+    .basic.active { background: var(--blue); border-color: var(--blue); }
+    .domain.active { background: var(--green); border-color: var(--green); }
+    .file.active { background: var(--purple); border-color: var(--purple); }
+    .page.active { background: var(--orange); border-color: var(--orange); }
+    .advanced.active { background: var(--pink); border-color: var(--pink); }
+    .preset.active { background: var(--yellow); border-color: var(--yellow); }
+
+    .inline-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .actions {
+      position: sticky;
+      bottom: 12px;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      margin-top: 18px;
+      background: rgba(8, 11, 18, 0.82);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.36);
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .action {
+      border-radius: 16px;
+      padding: 12px 16px;
+      color: #04111f;
+      font-weight: 850;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+
+    .action:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .search { background: linear-gradient(135deg, #38bdf8, #818cf8); }
+    .copy { background: linear-gradient(135deg, #34d399, #a7f3d0); }
+    .reset { background: linear-gradient(135deg, #fb7185, #fca5a5); }
+
+    .status {
+      color: var(--muted);
+      min-height: 22px;
+      font-size: 0.92rem;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 820px) {
+      .hero,
+      .input-grid,
+      .sections,
+      .inline-controls {
+        grid-template-columns: 1fr;
+      }
+
+      .app {
+        width: min(100% - 22px, 1180px);
+        padding-top: 18px;
+      }
+
+      .intro,
+      .builder,
+      .section,
+      .quick-help {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .actions {
+        position: static;
+        align-items: stretch;
+      }
+
+      .action-buttons,
+      .action {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <div class="card intro">
+        <h1>Ultimate Search Operator Builder</h1>
+        <p class="subtitle">Build precise Google searches with visual operator toggles, preset research modes, custom filters, and a live query preview.</p>
+      </div>
+      <aside class="card quick-help" aria-label="Quick search tips">
+        <h2>Quick Tips</h2>
+        <div class="tip">Toggle multiple chips to combine them into one Google-ready query.</div>
+        <div class="tip">Use custom fields for domains, exclusions, OR alternatives, groups, and proximity distance.</div>
+        <div class="tip">The generated query is URL encoded only when opening Google.</div>
+      </aside>
+    </section>
+
+    <section class="card builder">
+      <div class="input-grid">
+        <div>
+          <label for="baseQuery">Base search query</label>
+          <input id="baseQuery" type="text" placeholder="biology notes" autocomplete="off" />
+        </div>
+        <div>
+          <label for="customSite">Custom site/domain</label>
+          <input id="customSite" type="text" placeholder="example.edu" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="preview-row">
+        <div class="preview-label">
+          <strong>Live Query Preview</strong>
+          <span id="queryLength">0 characters</span>
+        </div>
+        <div id="preview" class="preview" aria-live="polite"></div>
+      </div>
+      <div id="activeTags" class="tags" aria-label="Active filters"></div>
+    </section>
+
+    <section class="sections" aria-label="Search operator controls">
+      <div class="card section">
+        <h2>Basic Logic</h2>
+        <div class="button-grid">
+          <button class="pill basic" data-toggle="normal">normal search</button>
+          <button class="pill basic" data-toggle="quotes">"exact match quotes"</button>
+          <button class="pill basic" data-toggle="or">OR operator (|)</button>
+          <button class="pill basic" data-toggle="exclude">-exclude words</button>
+          <button class="pill basic" data-toggle="group">(grouping support)</button>
+        </div>
+        <div class="inline-controls">
+          <input id="orInput" type="text" placeholder="OR terms: lab report | worksheet" />
+          <input id="excludeInput" type="text" placeholder="Exclude words: pinterest sample" />
+          <input id="groupInput" type="text" placeholder="Group terms: cells OR genetics" />
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>Domain Filters</h2>
+        <div class="button-grid">
+          <button class="pill domain" data-toggle="site:edu">site:edu</button>
+          <button class="pill domain" data-toggle="site:gov">site:gov</button>
+          <button class="pill domain" data-toggle="site:org">site:org</button>
+          <button class="pill domain" data-toggle="site:com">site:com</button>
+          <button class="pill domain" data-toggle="site:net">site:net</button>
+          <button class="pill domain" data-toggle="customSite">custom site input</button>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>File Types</h2>
+        <div class="button-grid">
+          <button class="pill file" data-toggle="filetype:pdf">filetype:pdf</button>
+          <button class="pill file" data-toggle="filetype:ppt">filetype:ppt</button>
+          <button class="pill file" data-toggle="filetype:doc">filetype:doc</button>
+          <button class="pill file" data-toggle="filetype:xls">filetype:xls</button>
+          <button class="pill file" data-toggle="filetype:txt">filetype:txt</button>
+          <button class="pill file" data-toggle="filetype:csv">filetype:csv</button>
+          <button class="pill file" data-toggle="filetype:rtf">filetype:rtf</button>
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>Page Filters</h2>
+        <div class="button-grid">
+          <button class="pill page" data-toggle="intitle">intitle:</button>
+          <button class="pill page" data-toggle="allintitle">allintitle:</button>
+          <button class="pill page" data-toggle="inurl">inurl:</button>
+          <button class="pill page" data-toggle="allinurl">allinurl:</button>
+          <button class="pill page" data-toggle="intext">intext:</button>
+          <button class="pill page" data-toggle="allintext">allintext:</button>
+        </div>
+        <div class="inline-controls">
+          <input id="titleInput" type="text" placeholder="Title text: notes" />
+          <input id="urlInput" type="text" placeholder="URL text: syllabus" />
+          <input id="textInput" type="text" placeholder="Page text: curriculum" />
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>Advanced Operators</h2>
+        <div class="button-grid">
+          <button class="pill advanced" data-toggle="cache">cache:</button>
+          <button class="pill advanced" data-toggle="related">related:</button>
+          <button class="pill advanced" data-toggle="info">info:</button>
+          <button class="pill advanced" data-toggle="define">define:</button>
+          <button class="pill advanced" data-toggle="around">AROUND(X) proximity search</button>
+        </div>
+        <div class="inline-controls">
+          <input id="advancedTarget" type="text" placeholder="URL/domain/term for cache, related, info, define" />
+          <input id="aroundTerms" type="text" placeholder="AROUND terms: climate change" />
+          <input id="aroundDistance" type="number" min="1" max="99" value="5" placeholder="Distance" />
+        </div>
+      </div>
+
+      <div class="card section">
+        <h2>Preset Modes</h2>
+        <div class="button-grid">
+          <button class="pill preset" data-preset="lecture">Lecture Notes Mode</button>
+          <button class="pill preset" data-preset="exam">Exam Papers Mode</button>
+          <button class="pill preset" data-preset="assignment">Assignment Mode</button>
+          <button class="pill preset" data-preset="research">Research Mode</button>
+          <button class="pill preset" data-preset="data">Data Mode</button>
+          <button class="pill preset" data-preset="documents">Document Finder Mode</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions" aria-label="Query actions">
+      <div id="status" class="status">Ready to build a smarter search.</div>
+      <div class="action-buttons">
+        <button id="searchGoogle" class="action search">Search Google</button>
+        <button id="copyQuery" class="action copy">Copy Query</button>
+        <button id="resetAll" class="action reset">Reset All</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const selected = new Set();
+    const baseQuery = document.getElementById('baseQuery');
+    const customSite = document.getElementById('customSite');
+    const preview = document.getElementById('preview');
+    const activeTags = document.getElementById('activeTags');
+    const queryLength = document.getElementById('queryLength');
+    const status = document.getElementById('status');
+
+    const controls = {
+      orInput: document.getElementById('orInput'),
+      excludeInput: document.getElementById('excludeInput'),
+      groupInput: document.getElementById('groupInput'),
+      titleInput: document.getElementById('titleInput'),
+      urlInput: document.getElementById('urlInput'),
+      textInput: document.getElementById('textInput'),
+      advancedTarget: document.getElementById('advancedTarget'),
+      aroundTerms: document.getElementById('aroundTerms'),
+      aroundDistance: document.getElementById('aroundDistance')
+    };
+
+    const presets = {
+      lecture: ['site:edu', 'filetype:pdf', 'intitle:notes'],
+      exam: ['filetype:pdf', 'intitle:exam', 'OR "past paper"'],
+      assignment: ['(site:edu OR site:org)'],
+      research: ['(site:edu OR site:ac.uk OR site:.edu.au)', 'filetype:pdf'],
+      data: ['(intitle:data OR intitle:statistics)'],
+      documents: ['(filetype:pdf OR filetype:ppt OR filetype:doc)']
+    };
+
+    function clean(value) {
+      return value.trim().replace(/\s+/g, ' ');
+    }
+
+    function quote(value) {
+      const cleaned = clean(value).replace(/^"|"$/g, '');
+      return cleaned ? `"${cleaned}"` : '';
+    }
+
+    function siteValue(value) {
+      return clean(value).replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+    }
+
+    function pageOperator(operator, value) {
+      const cleaned = clean(value);
+      if (!cleaned) return '';
+      return operator.startsWith('all') ? `${operator}:${cleaned}` : `${operator}:${quote(cleaned)}`;
+    }
+
+    function getBasePart() {
+      const base = clean(baseQuery.value);
+      if (!base) return '';
+      return selected.has('quotes') ? quote(base) : base;
+    }
+
+    function getQueryParts() {
+      const parts = [];
+      const base = getBasePart();
+      const activePreset = document.querySelector('.preset.active');
+      const titleText = controls.titleInput.value || baseQuery.value;
+      const urlText = controls.urlInput.value || baseQuery.value;
+      const textText = controls.textInput.value || baseQuery.value;
+      const target = controls.advancedTarget.value || customSite.value || baseQuery.value;
+
+      if (base) parts.push(base);
+
+      const domainParts = [];
+      ['site:edu', 'site:gov', 'site:org', 'site:com', 'site:net'].forEach(value => {
+        if (selected.has(value)) domainParts.push(value);
+      });
+
+      if (selected.has('customSite')) {
+        const domain = siteValue(customSite.value);
+        if (domain) domainParts.push(`site:${domain}`);
+      }
+
+      if (domainParts.length === 1) parts.push(domainParts[0]);
+      if (domainParts.length > 1) parts.push(`(${domainParts.join(' OR ')})`);
+
+      const fileParts = [];
+      ['filetype:pdf', 'filetype:ppt', 'filetype:doc', 'filetype:xls', 'filetype:txt', 'filetype:csv', 'filetype:rtf'].forEach(value => {
+        if (selected.has(value)) fileParts.push(value);
+      });
+
+      if (fileParts.length === 1) parts.push(fileParts[0]);
+      if (fileParts.length > 1) parts.push(`(${fileParts.join(' OR ')})`);
+
+      if (selected.has('or')) {
+        const terms = clean(controls.orInput.value);
+        if (terms) {
+          const orTerms = terms.split('|').map(clean).filter(Boolean).join(' OR ');
+          if (orTerms) parts.push(`(${orTerms})`);
+        } else if (base) {
+          parts.push(`OR ${quote(base)}`);
+        }
+      }
+
+      if (selected.has('exclude')) {
+        const exclusions = clean(controls.excludeInput.value).split(' ').filter(Boolean).map(word => `-${word}`);
+        parts.push(...exclusions);
+      }
+
+      if (selected.has('group')) {
+        const grouped = clean(controls.groupInput.value || baseQuery.value);
+        if (grouped) parts.push(`(${grouped})`);
+      }
+
+      if (selected.has('intitle')) parts.push(pageOperator('intitle', titleText));
+      if (selected.has('allintitle')) parts.push(pageOperator('allintitle', titleText));
+      if (selected.has('inurl')) parts.push(pageOperator('inurl', urlText));
+      if (selected.has('allinurl')) parts.push(pageOperator('allinurl', urlText));
+      if (selected.has('intext')) parts.push(pageOperator('intext', textText));
+      if (selected.has('allintext')) parts.push(pageOperator('allintext', textText));
+
+      ['cache', 'related', 'info', 'define'].forEach(operator => {
+        if (selected.has(operator)) {
+          const cleaned = clean(target);
+          if (cleaned) parts.push(`${operator}:${cleaned}`);
+        }
+      });
+
+      if (selected.has('around')) {
+        const terms = clean(controls.aroundTerms.value || baseQuery.value).split(' ').filter(Boolean);
+        const distance = Math.max(1, Number(controls.aroundDistance.value) || 5);
+        if (terms.length >= 2) {
+          const first = terms.shift();
+          const rest = terms.join(' ');
+          parts.push(`${first} AROUND(${distance}) ${rest}`);
+        }
+      }
+
+      if (activePreset) {
+        parts.push(...presets[activePreset.dataset.preset]);
+      }
+
+      return parts.filter(Boolean);
+    }
+
+    function buildQuery() {
+      if (selected.has('normal')) selected.delete('normal');
+      return getQueryParts().join(' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function renderTags(parts) {
+      activeTags.innerHTML = '';
+      if (!parts.length) {
+        const empty = document.createElement('span');
+        empty.className = 'tag';
+        empty.textContent = 'No active filters yet';
+        activeTags.appendChild(empty);
+        return;
+      }
+      parts.forEach(part => {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = part;
+        activeTags.appendChild(tag);
+      });
+    }
+
+    function update() {
+      const query = buildQuery();
+      const parts = getQueryParts();
+      preview.textContent = query || 'Type a query or select operators to generate a Google search string.';
+      queryLength.textContent = `${query.length} character${query.length === 1 ? '' : 's'}`;
+      renderTags(parts);
+      document.querySelectorAll('[data-toggle]').forEach(button => {
+        button.classList.toggle('active', selected.has(button.dataset.toggle));
+      });
+    }
+
+    document.querySelectorAll('[data-toggle]').forEach(button => {
+      button.addEventListener('click', () => {
+        const value = button.dataset.toggle;
+        if (value === 'normal') {
+          selected.clear();
+          document.querySelectorAll('.preset.active').forEach(preset => preset.classList.remove('active'));
+        } else if (selected.has(value)) {
+          selected.delete(value);
+        } else {
+          selected.add(value);
+        }
+        status.textContent = selected.has(value) ? `Added ${button.textContent}.` : `Updated operators.`;
+        update();
+      });
+    });
+
+    document.querySelectorAll('[data-preset]').forEach(button => {
+      button.addEventListener('click', () => {
+        const wasActive = button.classList.contains('active');
+        document.querySelectorAll('[data-preset]').forEach(preset => preset.classList.remove('active'));
+        if (!wasActive) {
+          button.classList.add('active');
+          status.textContent = `${button.textContent} applied.`;
+        } else {
+          status.textContent = 'Preset mode removed.';
+        }
+        update();
+      });
+    });
+
+    [...document.querySelectorAll('input')].forEach(input => input.addEventListener('input', update));
+
+    document.getElementById('searchGoogle').addEventListener('click', () => {
+      const query = buildQuery();
+      if (!query) {
+        status.textContent = 'Add a query or operator before searching.';
+        return;
+      }
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank', 'noopener,noreferrer');
+      status.textContent = 'Opened Google search in a new tab.';
+    });
+
+    document.getElementById('copyQuery').addEventListener('click', async () => {
+      const query = buildQuery();
+      if (!query) {
+        status.textContent = 'Nothing to copy yet.';
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(query);
+        status.textContent = 'Query copied to clipboard.';
+      } catch (error) {
+        const helper = document.createElement('textarea');
+        helper.value = query;
+        document.body.appendChild(helper);
+        helper.select();
+        document.execCommand('copy');
+        helper.remove();
+        status.textContent = 'Query copied with fallback clipboard support.';
+      }
+    });
+
+    document.getElementById('resetAll').addEventListener('click', () => {
+      selected.clear();
+      document.querySelectorAll('input').forEach(input => {
+        if (input.id === 'aroundDistance') input.value = 5;
+        else input.value = '';
+      });
+      document.querySelectorAll('.preset.active').forEach(preset => preset.classList.remove('active'));
+      status.textContent = 'Everything has been reset.';
+      update();
+    });
+
+    update();
+  </script>
+</body>
+</html>
